@@ -3,6 +3,7 @@ from xml.sax.handler import property_dom_node
 
 import numpy as np
 import pygame
+import random
 
 from base import joc, entorn
 
@@ -121,13 +122,23 @@ class Laberint(joc.Joc):
 
         return state["POS"], reward, status
 
-    def reset(self, start_cell=(0, 7)):
+    # Reinicia la salida del agente a una nueva posición aleatoria válida
+    def reset(self):
+        start_cell = (random.randint(0, 7), random.randint(0, 7)) 
+        while not self.esValid(start_cell):
+            start_cell = (random.randint(0, 7), random.randint(0, 7))
         self.__previous_cell = self.__current_cell = start_cell
         self.__total_reward = 0.0  # accumulated reward
         self.__visited = set()  # a set() only stores unique values
         self.set_game_status(False)
 
         return start_cell
+    
+    # Comprueba que la posición inicial del agente sea válida
+    def esValid(self, cell):
+        new_cell = (cell[1],cell[0])    # Cambiar fila por columna
+        # Comprobar si no es pared o meta o inicio no posible (0,0)
+        return self.__maze[new_cell] == 0 and new_cell != self.__exit_cell and new_cell != self.__start_cell
 
     def __execute(self, action):
         """Execute action and collect the reward or penalty.

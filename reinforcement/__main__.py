@@ -1,6 +1,3 @@
-import sys
-sys.path.append("C:\\Users\\adria\\OneDrive\\Documentos\\24-25\\1er_SEMESTRE\\IA\\GIT\\ia_2024")
-
 import logging
 
 from reinforcement.agent import AgentQ
@@ -23,7 +20,7 @@ def main():
         episodes=1000,
         stop_at_convergence=True,
     )
-
+    
     game.reset()
     game.set_agent([agent])
     game.comencar()

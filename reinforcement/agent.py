@@ -129,7 +129,8 @@ class AgentQ(AbstractModel):
                 # Determine the maximum Q-value for the current state
                 max_q = max(actions_q.values())
                 # Find all actions that have the maximum Q-value
-                max_actions = [action for action, q in actions_q.items() if q == max_q]
+                max_actions = [action for action,
+                               q in actions_q.items() if q == max_q]
                 # Choose one action randomly among those with the max Q-value
                 best_action = random.choice(max_actions)
             else:
@@ -141,11 +142,13 @@ class AgentQ(AbstractModel):
             matrix_x = x - min_x  # Column index
 
             Q_matrix[matrix_y][matrix_x] = max_q
-            Policy_matrix[matrix_y][matrix_x] = AgentQ._action_to_symbol(best_action)
+            Policy_matrix[matrix_y][matrix_x] = AgentQ._action_to_symbol(
+                best_action)
 
         # Convert None to a placeholder (e.g., '-') for better readability
         Q_matrix_display = np.where(Q_matrix == None, '-', Q_matrix)
-        Policy_matrix_display = np.where(Policy_matrix == None, '-', Policy_matrix)
+        Policy_matrix_display = np.where(
+            Policy_matrix == None, '-', Policy_matrix)
 
         # Print the Q-values matrix
         print("Q-Table Maximum Values (Rows: Y-axis, Columns: X-axis):")
@@ -155,7 +158,8 @@ class AgentQ(AbstractModel):
                 if cell == '-':
                     row_display += f"{cell:^6} "  # Center the placeholder
                 else:
-                    row_display += f"{cell:6.2f} "  # Format Q-values to two decimal places
+                    # Format Q-values to two decimal places
+                    row_display += f"{cell:6.2f} "
             print(row_display)
         print()  # Add an empty line for better readability
 
@@ -164,7 +168,8 @@ class AgentQ(AbstractModel):
         for row in Policy_matrix_display:
             row_display = ""
             for cell in row:
-                row_display += f"{cell:^6} "  # Center the action symbol or placeholder
+                # Center the action symbol or placeholder
+                row_display += f"{cell:^6} "
             print(row_display)
 
     @staticmethod
@@ -220,19 +225,22 @@ class AgentQ(AbstractModel):
         # training starts here
         for episode in range(1, episodes + 1):
 
+            # inicialize S
             state = self.environment.reset()
 
-            # choose action epsilon greedy
+            # choose A form S using policy derived form Q
             if np.random.random() < exploration_rate:
                 action = random.choice(self.environment.actions)
             else:
                 action = self.predict(state)
 
+            #loop for each step of episode
             while True:
+                #Take action A, observa R, S'
                 next_state, reward, status = self.environment._aplica(action)
                 cumulative_reward += reward
 
-                # choose next action epsilon greedy
+                # choose A' form S' using policy derived form Q
                 if np.random.random() < exploration_rate:
                     next_action = random.choice(self.environment.actions)
                 else:
@@ -256,7 +264,7 @@ class AgentQ(AbstractModel):
                 next_Q = self.Q[(next_state, next_action)]
 
                 self.Q[(state, action)] = self.Q[(state, action)] + learning_rate * (
-                        reward + discount * next_Q - self.Q[(state, action)]
+                    reward + discount * next_Q - self.Q[(state, action)]
                 )
 
                 if status in (
@@ -264,7 +272,8 @@ class AgentQ(AbstractModel):
                         Status.LOSE,
                 ):  # terminal state reached, stop episode
                     break
-
+                
+                # update S and A
                 state = next_state
                 action = next_action
 
